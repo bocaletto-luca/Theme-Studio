@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "name": "High Contrast Theme",
+    "version": "1.0.0",
+    "author": "Theme Studio"
+  },
+  "tokens": {
+    "color-primary": {
+      "50": "#ffffff",
+      "100": "#e6f0ff",
+      "200": "#cce0ff",
+      "300": "#99c2ff",
+      "400": "#3385ff",
+      "500": "#0066ff",
+      "600": "#0047b3",
+      "700": "#002b80",
+      "800": "#00194d",
+      "900": "#000d26"
+    },
+    "color-secondary": {
+      "50": "#ffffff",
+      "100": "#fff0e6",
+      "200": "#ffd9b3",
+      "300": "#ffb366",
+      "400": "#ff8000",
+      "500": "#cc6600",
+      "600": "#994d00",
+      "700": "#663300",
+      "800": "#331a00",
+      "900": "#1a0d00"
+    },
+    "color-neutral": {
+      "50": "#ffffff",
+      "100": "#f2f2f2",
+      "200": "#d9d9d9",
+      "300": "#bfbfbf",
+      "400": "#808080",
+      "500": "#4d4d4d",
+      "600": "#333333",
+      "700": "#1a1a1a",
+      "800": "#0d0d0d",
+      "900": "#000000"
+    },
+    "typography": {
+      "font-family-base": "'Inter', sans-serif",
+      "font-size-base": "18px",
+      "line-height-base": "1.6",
+      "font-weight-normal": "600",
+      "font-weight-bold": "800"
+    },
+    "states": {
+      "hover-opacity": "1",
+      "focus-ring-color": "#ffcc00",
+      "disabled-opacity": "0.4"
+    }
+  }
+}
