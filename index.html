@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Theme Studio — Generatore CSS da JSON</title>
+  <meta name="description" content="Crea, valida e genera file CSS completi a partire da temi in JSON.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0a84ff">
+
+  <!-- CSS modulari (ammessi più fogli di stile) -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/preview.css">
+</head>
+<body>
+  <noscript>
+    Attiva JavaScript per utilizzare l’editor dei temi e generare i file CSS.
+  </noscript>
+
+  <!-- Barra superiore: gestione temi, import/export, generazione -->
+  <header class="toolbar" role="banner">
+    <div class="toolbar__left">
+      <h1 class="app-title">Theme Studio</h1>
+      <div class="field">
+        <label for="select-theme">Tema</label>
+        <select id="select-theme" name="select-theme" aria-label="Seleziona tema">
+          <option value="default">Default</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="high-contrast">High Contrast</option>
+          <option value="custom">Personalizzato</option>
+        </select>
+      </div>
+      <button id="btn-new" class="btn" type="button">Nuovo</button>
+      <button id="btn-duplicate" class="btn" type="button">Duplica</button>
+      <button id="btn-reset" class="btn btn-ghost" type="button" title="Ripristina ai valori di default">Reset</button>
+    </div>
+
+    <div class="toolbar__right">
+      <input id="input-import-json" type="file" accept="application/json" hidden>
+      <button id="btn-import-json" class="btn" type="button">Importa JSON</button>
+      <button id="btn-export-json" class="btn" type="button">Esporta JSON</button>
+      <button id="btn-save-theme" class="btn" type="button">Salva tema</button>
+      <button id="btn-validate" class="btn btn-ghost" type="button" title="Verifica contrasto e accessibilità">Valida</button>
+      <button id="btn-generate-css" class="btn btn-primary" type="button">Genera CSS</button>
+      <a id="btn-download-css" class="btn btn-primary" href="#" download="theme.css" role="button" aria-label="Scarica CSS" hidden>Scarica CSS</a>
+    </div>
+  </header>
+
+  <main id="app" class="layout" role="main">
+    <!-- Editor sinistra -->
+    <section class="panel editor" aria-label="Editor del tema">
+      <nav class="tabs" role="tablist" aria-label="Sezioni editor">
+        <button id="tab-colors" class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-colors">Colori</button>
+        <button id="tab-typography" class="tab" role="tab" aria-selected="false" aria-controls="panel-typography">Tipografia</button>
+        <button id="tab-spacing" class="tab" role="tab" aria-selected="false" aria-controls="panel-spacing">Spaziatura & Raggio</button>
+        <button id="tab-effects" class="tab" role="tab" aria-selected="false" aria-controls="panel-effects">Effetti</button>
+        <button id="tab-tokens" class="tab" role="tab" aria-selected="false" aria-controls="panel-tokens">Token</button>
+        <button id="tab-accessibility" class="tab" role="tab" aria-selected="false" aria-controls="panel-accessibility">Accessibilità</button>
+      </nav>
+
+      <!-- Pannello: Colori -->
+      <div id="panel-colors" class="tab-panel is-active" role="tabpanel" aria-labelledby="tab-colors">
+        <fieldset class="grid-2">
+          <legend>Palette di base</legend>
+
+          <div class="field">
+            <label for="color-primary">Primary</label>
+            <input id="color-primary" type="color" value="#3b82f6">
+            <input id="color-primary-text" type="color" value="#ffffff" aria-label="Testo su primary">
+          </div>
+
+          <div class="field">
+            <label for="color-secondary">Secondary</label>
+            <input id="color-secondary" type="color" value="#8b5cf6">
+            <input id="color-secondary-text" type="color" value="#ffffff" aria-label="Testo su secondary">
+          </div>
+
+          <div class="field">
+            <label for="color-accent">Accent</label>
+            <input id="color-accent" type="color" value="#22c55e">
+            <input id="color-accent-text" type="color" value="#0b0f14" aria-label="Testo su accent">
+          </div>
+
+          <div class="field">
+            <label for="color-bg">Background</label>
+            <input id="color-bg" type="color" value="#0b0f14">
+            <input id="color-text" type="color" value="#e6e8eb" aria-label="Colore testo principale">
+          </div>
+
+          <div class="field">
+            <label for="color-surface">Surface</label>
+            <input id="color-surface" type="color" value="#11161c">
+            <input id="color-surface-text" type="color" value="#e6e8eb" aria-label="Testo su surface">
+          </div>
+
+          <div class="field">
+            <label for="color-muted">Muted</label>
+            <input id="color-muted" type="color" value="#94a3b8">
+            <input id="color-border" type="color" value="#253041" aria-label="Bordi">
+          </div>
+        </fieldset>
+
+        <fieldset class="grid-3">
+          <legend>Stati</legend>
+
+          <div class="field">
+            <label for="color-success">Success</label>
+            <input id="color-success" type="color" value="#16a34a">
+            <input id="color-success-text" type="color" value="#06210f" aria-label="Testo su success">
+          </div>
+
+          <div class="field">
+            <label for="color-warning">Warning</label>
+            <input id="color-warning" type="color" value="#f59e0b">
+            <input id="color-warning-text" type="color" value="#221705" aria-label="Testo su warning">
+          </div>
+
+          <div class="field">
+            <label for="color-danger">Danger</label>
+            <input id="color-danger" type="color" value="#ef4444">
+            <input id="color-danger-text" type="color" value="#2a0606" aria-label="Testo su danger">
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Pannello: Tipografia -->
+      <div id="panel-typography" class="tab-panel" role="tabpanel" aria-labelledby="tab-typography" hidden>
+        <fieldset class="grid-3">
+          <legend>Font</legend>
+
+          <div class="field">
+            <label for="font-family">Font family</label>
+            <input id="font-family" type="text" value="system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" placeholder="Es. Inter, ui-sans-serif">
+          </div>
+
+          <div class="field">
+            <label for="font-size-base">Dimensione base (px)</label>
+            <input id="font-size-base" type="number" min="10" max="24" step="1" value="16">
+          </div>
+
+          <div class="field">
+            <label for="type-scale">Scala tipografica</label>
+            <select id="type-scale">
+              <option value="1.067">Minor Second (1.067)</option>
+              <option value="1.125">Major Second (1.125)</option>
+              <option value="1.200">Minor Third (1.200)</option>
+              <option value="1.250">Major Third (1.250)</option>
+              <option value="1.333">Perfect Fourth (1.333)</option>
+              <option value="1.414" selected>Augmented Fourth (1.414)</option>
+              <option value="1.500">Perfect Fifth (1.500)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="grid-3">
+          <legend>Metriche</legend>
+
+          <div class="field">
+            <label for="line-height">Line-height</label>
+            <input id="line-height" type="number" min="1" max="2" step="0.05" value="1.5">
+          </div>
+
+          <div class="field">
+            <label for="font-weight-normal">Peso normale</label>
+            <input id="font-weight-normal" type="number" min="100" max="700" step="50" value="400">
+          </div>
+
+          <div class="field">
+            <label for="font-weight-bold">Peso bold</label>
+            <input id="font-weight-bold" type="number" min="500" max="900" step="50" value="700">
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Pannello: Spaziatura & Raggio -->
+      <div id="panel-spacing" class="tab-panel" role="tabpanel" aria-labelledby="tab-spacing" hidden>
+        <fieldset class="grid-3">
+          <legend>Scala spazi</legend>
+
+          <div class="field">
+            <label for="space-base">Unità base (px)</label>
+            <input id="space-base" type="number" min="2" max="16" step="1" value="8">
+          </div>
+
+          <div class="field">
+            <label for="space-multiplier">Moltiplicatore</label>
+            <input id="space-multiplier" type="number" min="1" max="2" step="0.05" value="1.25">
+          </div>
+
+          <div class="field">
+            <label for="radius-base">Raggio base (px)</label>
+            <input id="radius-base" type="number" min="0" max="24" step="1" value="8">
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Pannello: Effetti -->
+      <div id="panel-effects" class="tab-panel" role="tabpanel" aria-labelledby="tab-effects" hidden>
+        <fieldset class="grid-3">
+          <legend>Ombre</legend>
+
+          <div class="field">
+            <label for="shadow-color">Colore ombre</label>
+            <input id="shadow-color" type="color" value="#000000">
+          </div>
+
+          <div class="field">
+            <label for="shadow-opacity">Opacità</label>
+            <input id="shadow-opacity" type="number" min="0" max="1" step="0.05" value="0.35">
+          </div>
+
+          <div class="field">
+            <label for="shadow-blur">Intensità (px)</label>
+            <input id="shadow-blur" type="number" min="0" max="48" step="1" value="24">
+          </div>
+        </fieldset>
+
+        <fieldset class="grid-2">
+          <legend>Transizioni</legend>
+
+          <div class="field">
+            <label for="transition-duration">Durata (ms)</label>
+            <input id="transition-duration" type="number" min="0" max="1000" step="25" value="150">
+          </div>
+
+          <div class="field">
+            <label for="transition-easing">Easing</label>
+            <select id="transition-easing">
+              <option value="ease">ease</option>
+              <option value="ease-in">ease-in</option>
+              <option value="ease-out" selected>ease-out</option>
+              <option value="ease-in-out">ease-in-out</option>
+              <option value="linear">linear</option>
+            </select>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Pannello: Token -->
+      <div id="panel-tokens" class="tab-panel" role="tabpanel" aria-labelledby="tab-tokens" hidden>
+        <div class="tokens">
+          <div class="tokens__header">
+            <h3>Token personalizzati</h3>
+            <button id="btn-add-token" class="btn" type="button">Aggiungi token</button>
+          </div>
+          <table class="table tokens__table" aria-label="Elenco token CSS">
+            <thead>
+              <tr>
+                <th>Nome variabile</th>
+                <th>Valore</th>
+                <th>Descrizione</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="tokens-body">
+              <!-- Righe generate da JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pannello: Accessibilità -->
+      <div id="panel-accessibility" class="tab-panel" role="tabpanel" aria-labelledby="tab-accessibility" hidden>
+        <fieldset class="grid-3">
+          <legend>Verifica contrasto</legend>
+
+          <div class="field">
+            <label for="a11y-fg">Colore testo</label>
+            <input id="a11y-fg" type="color" value="#e6e8eb">
+          </div>
+
+          <div class="field">
+            <label for="a11y-bg">Colore sfondo</label>
+            <input id="a11y-bg" type="color" value="#0b0f14">
+          </div>
+
+          <div class="field">
+            <label>Rapporto</label>
+            <output id="a11y-ratio" aria-live="polite">—</output>
+          </div>
+        </fieldset>
+
+        <div class="a11y-results">
+          <div class="badge" id="a11y-aa-large" aria-live="polite">AA Large: —</div>
+          <div class="badge" id="a11y-aa" aria-live="polite">AA: —</div>
+          <div class="badge" id="a11y-aaa" aria-live="polite">AAA: —</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anteprima destra -->
+    <section class="panel preview" aria-label="Anteprima componenti">
+      <div class="preview__toolbar">
+        <span class="label">Viewport</span>
+        <div class="btn-group" role="group" aria-label="Imposta larghezza anteprima">
+          <button id="vp-mobile" class="btn" type="button" data-width="375">Mobile</button>
+          <button id="vp-tablet" class="btn" type="button" data-width="768">Tablet</button>
+          <button id="vp-desktop" class="btn is-active" type="button" data-width="1200">Desktop</button>
+          <button id="vp-full" class="btn btn-ghost" type="button" data-width="100%">Auto</button>
+        </div>
+        <div class="spacer"></div>
+        <button id="btn-theme-ui" class="btn btn-ghost" type="button" title="Switch UI chiara/scura">UI</button>
+      </div>
+
+      <div id="preview-root" class="preview__frame" role="region" aria-label="Area di anteprima">
+        <!-- Navbar -->
+        <nav class="navbar">
+          <div class="navbar__brand">Brand</div>
+          <ul class="navbar__menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Prodotti</a></li>
+            <li><a href="#">Contatti</a></li>
+          </ul>
+          <button class="btn btn-primary">Accedi</button>
+        </nav>
+
+        <!-- Hero -->
+        <section class="hero">
+          <h2>Crea il tuo design system</h2>
+          <p>Modifica colori, tipografia, spazi e genera un CSS perfetto, pronto per la produzione.</p>
+          <div class="btn-group">
+            <button class="btn btn-primary">Inizia</button>
+            <button class="btn">Scopri di più</button>
+          </div>
+        </section>
+
+        <!-- Bottoni -->
+        <section class="section">
+          <h3>Bottoni</h3>
+          <div class="stack-h">
+            <button class="btn">Default</button>
+            <button class="btn btn-primary">Primary</button>
+            <button class="btn btn-secondary">Secondary</button>
+            <button class="btn btn-accent">Accent</button>
+            <button class="btn btn-success">Success</button>
+            <button class="btn btn-warning">Warning</button>
+            <button class="btn btn-danger">Danger</button>
+          </div>
+        </section>
+
+        <!-- Form -->
+        <section class="section">
+          <h3>Form</h3>
+          <form class="form grid-2">
+            <div class="field">
+              <label for="demo-name">Nome</label>
+              <input id="demo-name" type="text" placeholder="Mario Rossi">
+            </div>
+            <div class="field">
+              <label for="demo-email">Email</label>
+              <input id="demo-email" type="email" placeholder="nome@dominio.it">
+            </div>
+            <div class="field">
+              <label for="demo-select">Ruolo</label>
+              <select id="demo-select">
+                <option>Seleziona…</option>
+                <option>Designer</option>
+                <option>Developer</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="demo-range">Soddisfazione</label>
+              <input id="demo-range" type="range" min="0" max="10" value="7">
+            </div>
+            <div class="field">
+              <label for="demo-msg">Messaggio</label>
+              <textarea id="demo-msg" rows="3" placeholder="Scrivi qualcosa…"></textarea>
+            </div>
+            <div class="field align-end">
+              <button type="button" class="btn btn-primary">Invia</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Card -->
+        <section class="section">
+          <h3>Card</h3>
+          <div class="cards grid-3">
+            <article class="card">
+              <img alt="Anteprima 1" src="" role="presentation">
+              <div class="card__body">
+                <h4>Titolo card</h4>
+                <p>Testo di esempio per verificare gerarchie e contrasto.</p>
+                <button class="btn">Azione</button>
+              </div>
+            </article>
+            <article class="card">
+              <img alt="Anteprima 2" src="" role="presentation">
+              <div class="card__body">
+                <h4>Titolo card</h4>
+                <p>Testo di esempio per verificare gerarchie e contrasto.</p>
+                <button class="btn btn-primary">Azione</button>
+              </div>
+            </article>
+            <article class="card">
+              <img alt="Anteprima 3" src="" role="presentation">
+              <div class="card__body">
+                <h4>Titolo card</h4>
+                <p>Testo di esempio per verificare gerarchie e contrasto.</p>
+                <button class="btn btn-secondary">Azione</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tabella -->
+        <section class="section">
+          <h3>Tabella</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Ruolo</th>
+                <th>Stato</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ada Lovelace</td>
+                <td>Matematica</td>
+                <td><span class="badge badge-success">Attivo</span></td>
+                <td><button class="btn btn-ghost">Modifica</button></td>
+              </tr>
+              <tr>
+                <td>Alan Turing</td>
+                <td>Ricercatore</td>
+                <td><span class="badge badge-warning">In revisione</span></td>
+                <td><button class="btn btn-ghost">Modifica</button></td>
+              </tr>
+              <tr>
+                <td>Grace Hopper</td>
+                <td>Ingegnere</td>
+                <td><span class="badge badge-danger">Bloccato</span></td>
+                <td><button class="btn btn-ghost">Modifica</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Alert -->
+        <section class="section">
+          <h3>Alert</h3>
+          <div class="alert">Questo è un messaggio informativo.</div>
+          <div class="alert alert-success">Operazione completata con successo.</div>
+          <div class="alert alert-warning">Attenzione: controlla i dati inseriti.</div>
+          <div class="alert alert-danger">Errore: qualcosa è andato storto.</div>
+        </section>
+
+        <!-- Tabs -->
+        <section class="section">
+          <h3>Tabs</h3>
+          <div class="tabs tabs-line">
+            <button class="tab is-active" type="button">Tab 1</button>
+            <button class="tab" type="button">Tab 2</button>
+            <button class="tab" type="button">Tab 3</button>
+          </div>
+          <div class="prose">
+            <p>Contenuto di esempio per valutare spaziatura, interlinea e rapporti tipografici.</p>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+          <small>Anteprima generata dal tuo tema. Modifica i valori a sinistra e osserva i cambiamenti.</small>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast/status -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Dialog: CSS generato -->
+  <dialog id="cssDialog" aria-labelledby="cssDialogTitle">
+    <form method="dialog" class="dialog__header">
+      <h3 id="cssDialogTitle">CSS generato</h3>
+      <button id="btn-close-css" class="btn btn-ghost" value="close" aria-label="Chiudi">Chiudi</button>
+    </form>
+    <div class="dialog__body">
+      <div class="field">
+        <label for="generated-css">Anteprima CSS</label>
+        <textarea id="generated-css" rows="20" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="dialog__footer">
+      <button id="btn-copy-css" class="btn" type="button">Copia</button>
+      <a id="btn-download-css-modal" class="btn btn-primary" href="#" download="theme.css" role="button">Scarica</a>
+    </div>
+  </dialog>
+
+  <!-- Dati: indicazioni per app.js -->
+  <template id="token-row-template">
+    <tr>
+      <td><input type="text" class="token-name" placeholder="--my-token"></td>
+      <td><input type="text" class="token-value" placeholder="valore CSS (es. 1rem, #fff, 8px 8px)"></td>
+      <td><input type="text" class="token-desc" placeholder="Descrizione opzionale"></td>
+      <td>
+        <button type="button" class="btn btn-ghost token-move-up" title="Sposta su">↑</button>
+        <button type="button" class="btn btn-ghost token-move-down" title="Sposta giù">↓</button>
+        <button type="button" class="btn btn-danger token-remove" title="Rimuovi">✕</button>
+      </td>
+    </tr>
+  </template>
+
+  <!-- Script unico con tutta la logica -->
+  <script src="app.js"></script>
+</body>
+</html>
