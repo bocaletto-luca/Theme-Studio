@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Theme Studio - Test</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: var(--typography-font-family-base, sans-serif);
+      font-size: var(--typography-font-size-base, 16px);
+      line-height: var(--typography-line-height-base, 1.5);
+      background-color: var(--color-neutral-50, #fff);
+      color: var(--color-neutral-900, #000);
+      padding: 2rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    h1, h2 {
+      color: var(--color-primary-500, #2a94ff);
+    }
+    button {
+      background-color: var(--color-primary-500, #2a94ff);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      margin: 0.3rem;
+      cursor: pointer;
+      font-weight: var(--typography-font-weight-bold, 700);
+      transition: opacity 0.2s;
+    }
+    button:hover {
+      opacity: var(--states-hover-opacity, 0.85);
+    }
+    .secondary {
+      background-color: var(--color-secondary-500, #ff732a);
+    }
+    .neutral {
+      background-color: var(--color-neutral-500, #71717a);
+    }
+    .theme-switcher {
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-switcher">
+    <button id="btn-default">Default</button>
+    <button id="btn-dark">Dark Mode</button>
+    <button id="btn-contrast">High Contrast</button>
+  </div>
+
+  <h1>Theme Studio Test Page</h1>
+  <p>Questa è una pagina di esempio per verificare l'applicazione dei temi in tempo reale.</p>
+
+  <h2>Bottoni di esempio</h2>
+  <button>Primario</button>
+  <button class="secondary">Secondario</button>
+  <button class="neutral">Neutro</button>
+
+  <script src="app.js"></script>
+  <script>
+    // Caricamento rapido dei temi di test
+    const loadThemeFromFile = (file) => {
+      fetch(file)
+        .then(r => r.json())
+        .then(json => applyTheme(json));
+    };
+
+    document.getElementById('btn-default').addEventListener('click', () => {
+      loadThemeFromFile('data/default-theme.json');
+    });
+    document.getElementById('btn-dark').addEventListener('click', () => {
+      loadThemeFromFile('data/dark-theme.json');
+    });
+    document.getElementById('btn-contrast').addEventListener('click', () => {
+      loadThemeFromFile('data/high-contrast-theme.json');
+    });
+  </script>
+</body>
+</html>
